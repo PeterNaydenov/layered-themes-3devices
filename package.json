@@ -36,7 +36,7 @@
     "theme",
     "engine"
   ],
-  "main": "Gruntfile.js",
+  "main": "tasks/layered_themes_3devices.js",
   "directories": {
     "test": "test"
   },
