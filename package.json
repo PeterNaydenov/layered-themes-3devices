@@ -1,0 +1,42 @@
+{
+  "name": "layered-themes-3devices",
+  "description": "Plugin engine for 'Layered-themes'.",
+  "version": "0.1.0",
+  "homepage": "https://github.com/peternaydenov/layered-themes-3devices",
+  "author": {
+    "name": "Peter Naydenov",
+    "email": "free@backformation.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/peternaydenov/layered-themes-3devices.git"
+  },
+  "bugs": {
+    "url": "https://github.com/peternaydenov/layered-themes-3devices/issues"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/peternaydenov/layered-themes-3devices/blob/master/LICENSE-MIT"
+    }
+  ],
+  "engines": {
+    "node": ">= 0.8.0"
+  },
+  "scripts": {
+    "test": "grunt test"
+  },
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-contrib-nodeunit": "^0.3.3"
+  },
+  "peerDependencies": {
+    "grunt": "~0.4.5"
+  },
+  "keywords": [
+    "grunt",
+    "Layered-themes",
+    "theme",
+    "engine"
+  ]
+}
