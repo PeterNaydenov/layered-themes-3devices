@@ -3,10 +3,7 @@
   "description": "Plugin engine for 'Layered-themes'.",
   "version": "0.1.0",
   "homepage": "https://github.com/peternaydenov/layered-themes-3devices",
-  "author": {
-    "name": "Peter Naydenov",
-    "email": "free@backformation.com"
-  },
+  "author": "Peter Naydenov <free@backformation.com>",
   "repository": {
     "type": "git",
     "url": "git://github.com/peternaydenov/layered-themes-3devices.git"
@@ -38,5 +35,13 @@
     "Layered-themes",
     "theme",
     "engine"
-  ]
+  ],
+  "main": "Gruntfile.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "grunt": "^0.4.5"
+  },
+  "license": "MIT"
 }
