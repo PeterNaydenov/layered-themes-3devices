@@ -25,46 +25,46 @@ start : function ( options ) {
         , setting = 'default'
         , mobile , tablet , desktop
         , change = false
+        , error  = []
         ;
+
+
+// if folders are not set use default values - mobile, tablet, desktop;
+if ( !config.folders || config.folders.length == 0 ) config.folders = [ 'mobile', 'tablet' , 'desktop'];
 
 expand = ( 'expand' in config ) ? config.expand : false;
 
-saveConfig = {
+      // set saveConfig file function.
+      ( function () { 
+                        var el = JSON.stringify ({
+                                                        content : { inherit  : 'default' }
+                                                      , include : { inherit  : 'default' }
+                                                      , extra   : { inherit  : 'default' }
+                                                });
 
-                  default : {
-                                content  : {}
-                              , include  : {}
-                              , extra    : {}
-                          } ,
-                  mobile  : {
-                                content  : { 
-                                              'default' : [  { mobile : '-'}  ]
-                                         }
-                              , include  : { }
-                              , extra    : { }
-                          } ,
-                  tablet  : {
-                                content  : {
-                                              'default' : [
-                                                              { mobile    : '-mobile' }
-                                                            , { tablet    : 'mobile-' }
-                                                          ]
-                                         }
-                              , include  : {}
-                              , extra    : {}
-                          } ,
-                  desktop : {
-                                content  : {
-                                              'default' : [
-                                                                { mobile  : '-mobile'}
-                                                              , { tablet  : 'mobile-hq'}
-                                                              , { desktop : 'hq-'}
-                                                          ]
-                                          }
-                              , include  : {}
-                              , extra    : {}
-                          }
-} // saveConfig
+
+                    saveConfig['default'] = {
+                                                  content : {}
+                                                , include : {}
+                                                , extra   : {}
+                                            };
+
+                    config.folders.forEach ( function ( name , index ) { 
+                            saveConfig[name] = JSON.parse(el);
+                            if ( index == 0 ) saveConfig[name]['content']['default'] = [ { mobile : '-'} ];
+                            if ( index == 1 ) saveConfig[name]['content']['default'] = [ 
+                                                                                             { mobile : '-mobile'}
+                                                                                           , { tablet : 'mobile-'}
+                                                                                        ];
+                            if ( index == 2 ) saveConfig[name]['content']['default'] = [
+                                                                                             { mobile  : '-mobile'}
+                                                                                           , { tablet  : 'mobile-hq'}
+                                                                                           , { desktop : 'hq-'}
+                                                                                       ];
+                    });
+
+      })(); // set saveConfig func.
+
 
 
 // fulfil configuration;
@@ -77,6 +77,15 @@ if ( themes.mobile == themes.tablet && themes.tablet == themes.desktop ) setting
 if ( themes.mobile == themes.tablet && themes.tablet != themes.desktop ) setting = 'tabAsMobile';  
 if ( themes.mobile != themes.tablet && themes.tablet == themes.desktop ) setting = 'tabAsDesktop';
 
+
+
+( function () { 
+// setting cases
+                  var 
+                        dMobile  = options.config.folders[0]
+                      , dTablet  = options.config.folders[1]
+                      , dDesktop = options.config.folders[2]
+                      ;
 
 switch ( setting ) {
 // 'setting' and 'config.extend' add modifications to saveConfig;
@@ -102,8 +111,8 @@ switch ( setting ) {
                                                                                desktop = {'desktop' : '-'}; 
                                                            } 
                                 
-                                saveConfig['tablet' ]['content']['default'] = saveConfig['mobile']['content']['default']
-                                if ( change ) saveConfig['desktop']['content']['default'] = [ mobile, desktop ];
+                                saveConfig[dTablet]['content']['default'] = saveConfig[dMobile]['content']['default'];
+                                saveConfig[dDesktop]['content']['default'] = [ mobile, desktop ];
                                 break;
 
           case 'tabAsDesktop' :
@@ -114,10 +123,8 @@ switch ( setting ) {
                                 if ( expand.tablet  == 0 ) { change = true; tablet = { 'desktop': '-'} }
                                 if ( expand.desktop == 0 ) { change = true; tablet = { 'desktop': '-'} }
 
-                                if ( change ) {
-                                                            saveConfig['tablet' ]['content']['default'] = [ mobile , tablet ];
-                                                            saveConfig['desktop']['content']['default'] = [ mobile , tablet ];
-                                }
+                                saveConfig[ dTablet  ]['content']['default'] = [ mobile , tablet ];
+                                saveConfig[ dDesktop ]['content']['default'] = [ mobile , tablet ];
                                 break;
 
                      default : 
@@ -132,8 +139,85 @@ switch ( setting ) {
                               if ( expand.tablet  >= 1 ) { change = true; tablet  = { 'tablet'  : 'mobile-'}; }
                               if ( expand.desktop == 0 ) { change = true; desktop = { 'desktop' : '-'      }; }
 
-                              if ( change ) saveConfig['desktop']['content']['default'] = [ mobile , tablet , desktop  ];
+                              saveConfig[ dDesktop ]['content']['default'] = [ mobile , tablet , desktop  ];
      } // switch setting
+})(); // setting cases
+
+
+
+
+
+// include update
+ if ( 'include' in config ) {
+                               for ( var locate in config.include ) {
+                                    ( function (loc) {
+                                          var place;
+
+                                          switch ( loc ) {
+                                                case 'default': place='default';
+                                                                break;
+                                                case 'mobile' : 
+                                                                place = options.config.folders[0];   
+                                                                break;
+                                                case 'tablet' : 
+                                                                place = options.config.folders[1];  
+                                                                break;
+                                                case 'desktop' : 
+                                                                place = options.config.folders[2];  
+                                                                break;
+                                                       default : return;
+                                               } // switch split[0]
+
+                                          saveConfig[ place ]['include']['default'] = config.include[loc];
+
+                                    })(locate);
+                               }
+
+ if ( error.length > 0 ) return error;
+
+} // if include in config
+
+
+
+
+
+// extra update
+if ( 'extra' in config ) {
+                        for ( var locate in config.extra ) {
+                                    ( function (loc) {
+                                          var 
+                                                split = loc.split(',');
+
+                                          split[0] = split[0].trim();
+                                          split[1] = split[1].trim();
+
+                                          if ( split.length != 2 ) { 
+                                                                      error.push ( 'Wrong "include" configuration --> ' + loc + '. \nConfig file: ' + options.configFile );
+                                                                      return;
+                                                                    }
+                                          
+                                          switch ( split[0]) {
+                                                case 'default': split[0] = 'default'
+                                                                break;
+                                                case 'mobile' : 
+                                                                split[0] = options.config.folders[0];   
+                                                                break;
+                                                case 'tablet' : 
+                                                                split[0] = options.config.folders[1];  
+                                                                break;
+                                                case 'desktop' : 
+                                                                split[0] = options.config.folders[2];  
+                                                                break;
+                                                       default : return;
+                                               } // switch split[0]
+
+                                          saveConfig[ split[0] ]['extra'][ split[1] ] = config.extra[loc];
+
+                                    })(locate);
+                               }
+
+ if ( error.length > 0 ) return error;    
+} // extra update
 
 
 
@@ -146,6 +230,9 @@ options.MQcomment  = {
                         , 'hq-'       : 'desktop'
                      }
 
+return false;
 } // start func.
 
 }; // module
+
+
