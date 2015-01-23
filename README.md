@@ -183,7 +183,7 @@ Rename folders in your target folder by setting 'folders'. It's array of 3 strin
 
 
 ### Themes (required)
-Only "theme.default" is required actually. Default theme is responsible for keys and adds information where is not set.
+Only "themes.default" is required actually. Default theme is responsible for keys and adds information where is not set.
 
 
 
